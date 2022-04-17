@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:application.properties"/>
+
+    <bean id="repository" class="repository.Repository">
+        <property name="usersFilePath" value="${rep.users}"/>
+        <property name="eventFilePath" value="${rep.events}"/>
+    </bean>
+
+    <bean name="eventDao" class="dao.impl.EventDaoImpl">
+        <property name="repository" ref="repository"/>
+    </bean>
+
+    <bean name="userDao" class="dao.impl.UserDaoImpl">
+        <property name="repository" ref="repository"/>
+    </bean>
+
+    <bean name="ticketDao" class="dao.impl.TicketDaoImpl">
+        <property name="repository" ref="repository"/>
+    </bean>
+
+    <bean id="facade" name="bookingFacade" class="facade.impl.BookingFacadeImpl">
+        <constructor-arg index="0" ref="eventService"/>
+        <constructor-arg index="1" ref="ticketService"/>
+        <constructor-arg index="2" ref="userService"/>
+    </bean>
+
+    <bean name="eventService" class="service.impl.EventServiceImpl">
+        <property name="eventDao" ref="eventDao"/>
+        <property name="validatorService" ref="validatorService"/>
+    </bean>
+
+    <bean name="ticketService" class="service.impl.TicketServiceImpl">
+        <property name="ticketDao" ref="ticketDao" />
+        <property name="validatorService" ref="validatorService"/>
+    </bean>
+
+    <bean name="validatorService" class="validator.ValidatorService">
+        <property name="userDao" ref="userDao"/>
+        <property name="ticketDao" ref="ticketDao"/>
+        <property name="eventDao" ref="eventDao"/>
+    </bean>
+
+    <bean name="userService" class="service.impl.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+        <property name="validatorService" ref="validatorService"/>
+    </bean>
+</beans>
